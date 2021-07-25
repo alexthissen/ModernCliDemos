@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,9 +13,11 @@ namespace ASPNETCoreWithCLI.Pages
     {
         private readonly ILogger<IndexModel> _logger;
 
-        public IndexModel(ILogger<IndexModel> logger)
+        public IndexModel(ILogger<IndexModel> logger, IFoo foo, IOptions<FooOptions> option)
         {
             _logger = logger;
+            logger.LogInformation(foo.DoIt().ToString());
+            logger.LogInformation("Bar {bar} and Baz {baz}", option.Value.Bar, option.Value.Baz);
         }
 
         public void OnGet()
