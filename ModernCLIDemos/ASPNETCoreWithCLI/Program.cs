@@ -17,18 +17,25 @@ namespace ASPNETCoreWithCLI
 {
     public class Program
     {
-        public static async Task Main(string[] args) => await BuildCommandLine()
-            .UseHost(_ => Host.CreateDefaultBuilder(),
-                host =>
-                {
-                    host.ConfigureServices(services =>
+        public static int Main(string[] args)
+        {
+            Parser parser = BuildCommandLine()
+                .UseDefaults()
+                .UseHost(_ => CreateHostBuilder(_),
+                    host =>
                     {
-                        //services.AddSingleton<IConsole, Console>();
-                    });
-                })
-            .UseDefaults()
-            .Build()
-            .InvokeAsync(args);
+                        host.ConfigureServices(services =>
+                        {
+                            services.AddSingleton<IFoo, Foo>();
+                        });
+                        //.UseCommandHandler<;
+                        //.ConfigureHostConfiguration(config => { config.AddCommandLine(host.GetInvocationContext().BindingContext.ParseResult.UnparsedTokens.ToArray()); });
+                    })
+                .Build();
+
+                //return parser.InvokeAsync(args); 
+                return parser.Invoke(args); 
+        }
 
     private static CommandLineBuilder BuildCommandLine()
     {
@@ -37,18 +44,21 @@ namespace ASPNETCoreWithCLI
                     IsRequired = true
                 }
             };
-        root.Handler = CommandHandler.Create<string, ParseResult, IConsole, IHost>(Run);
+        root.Handler = CommandHandler.Create<string, IFoo, ParseResult, IConsole, IHost>(Run);
         return new CommandLineBuilder(root);
     }
 
-    private static void Run(string name, ParseResult result, IConsole console, IHost host)
+    private static void Run(string name, IFoo foo, ParseResult result, IConsole console, IHost host)
     {
         var serviceProvider = host.Services;
         var loggerFactory = serviceProvider.GetRequiredService<ILoggerFactory>();
         var logger = loggerFactory.CreateLogger(typeof(Program));
 
         logger.LogInformation(name);
-        CreateHostBuilder(result.UnmatchedTokens.ToArray()).Build().Run();
+        host.WaitForShutdown();
+        //host.Run();
+
+        logger.LogInformation("Ready Player One");
     }
 
     public static IHostBuilder CreateHostBuilder(string[] args) =>
@@ -57,5 +67,9 @@ namespace ASPNETCoreWithCLI
             {
                 webBuilder.UseStartup<Startup>();
             });
+
     }
+
+    public interface IFoo { }
+    public class Foo : IFoo { }
 }
