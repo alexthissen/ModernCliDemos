@@ -6,7 +6,7 @@ namespace DemoCLIDragonFruit
     class Program
     {
         /// <summary>
-        /// 
+        /// Very cool tool
         /// </summary>
         /// <param name="verbose">Verbose output</param>
         /// <param name="count">Count of greetings</param>
