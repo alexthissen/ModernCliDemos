@@ -24,11 +24,11 @@ namespace ASPNETCoreWithCLI
                 .UseDefaults()
                 .UseMiddleware((context, next) =>
                 {
-                    //ctxCustom = context;
+                    // Execute middleware before running host
                     return next(context);
                 })
                 .UseHost(
-                    _ => CreateHostBuilder(_),
+                    args => CreateHostBuilder(args),
                     builder =>
                     {
                         //builder.Properties.TryGetValue(typeof(InvocationContext), out var context);
@@ -41,42 +41,39 @@ namespace ASPNETCoreWithCLI
 
                         builder.ConfigureServices(services =>
                         {
-                            services.AddSingleton<IFoo, FooSimulator>();
-                            // Bind to options
+                            // Bind to options from command line
                             services.AddOptions<FooOptions>().BindCommandLine();
+
+                            // Use invocation context for smart things
                             context = builder.GetInvocationContext();
                         });
-                        
-                        //var args = context.ParseResult.UnparsedTokens.ToArray();
-                        //builder.ConfigureHostConfiguration(config =>
-                        //{
-                        //    config.AddCommandLine(args);
-                        //});
-                        //.ConfigureHostConfiguration(config => { config.AddCommandLine(host.GetInvocationContext().BindingContext.ParseResult.UnparsedTokens.ToArray()); });
                     })
                 .UseMiddleware((context, next) =>
                 {
+                    // Host is available in middleware now
                     IHost host = context.GetHost();
                     return next(context);
                 })
                 .Build();
 
             return parser.InvokeAsync(args);
-            //return parser.Invoke(args); 
         }
 
         private static CommandLineBuilder BuildCommandLine()
         {
-            var root = new RootCommand() {
-                new Argument("name"),
+            var root = new RootCommand();
+            root.Handler = CommandHandler.Create<IHost>(async (host) => await host.WaitForShutdownAsync());
+            //root.TreatUnmatchedTokensAsErrors = false;
+
+            Command simulate = new Command("simulate")
+            {
                 new Option<string>("--bar"),
                 new Option<string>("--baz")
             };
-            root.Handler = CommandHandler.Create<string, ParseResult, IConsole, IHost>(Run);
-            //root.TreatUnmatchedTokensAsErrors = false;
-
-            Command simulate = new Command("simulate");
-            simulate.AddOption(new Option<int>("--level", "-l"));
+            
+            Option<int> level = new Option<int>(new[] { "--level", "-l" }, "Simulation level");
+            level.IsRequired = true;
+            simulate.AddOption(level);
             simulate.Handler = CommandHandler.Create<int, ParseResult, IConsole, IHost>(Simulate);
             root.AddCommand(simulate);
 
@@ -90,29 +87,19 @@ namespace ASPNETCoreWithCLI
             var logger = loggerFactory.CreateLogger(typeof(Program));
 
             logger.LogInformation($"Simulating level {level}");
+
             await host.WaitForShutdownAsync();
 
-            logger.LogInformation("Ready Player One");
+            logger.LogInformation("Terminating simulation");
         }
 
-        private static async Task Run(string name, ParseResult result, IConsole console, IHost host)
+        private static async Task Run(IHost host)
         {
-            var serviceProvider = host.Services;
-            var loggerFactory = serviceProvider.GetRequiredService<ILoggerFactory>();
-            var logger = loggerFactory.CreateLogger(typeof(Program));
-
-            logger.LogInformation(name);
             await host.WaitForShutdownAsync();
-
-            logger.LogInformation("Ready Player One");
         }
 
         public static IHostBuilder CreateHostBuilder(string[] args) =>
             Host.CreateDefaultBuilder(args)
-                .ConfigureHostConfiguration(config =>
-                {
-                    config.AddCommandLine(args);
-                })
                 .ConfigureWebHostDefaults(webBuilder =>
                 {
                     webBuilder.UseStartup<Startup>();

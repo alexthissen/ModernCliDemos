@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using System;
@@ -13,7 +14,7 @@ namespace ASPNETCoreWithCLI.Pages
     {
         private readonly ILogger<IndexModel> _logger;
 
-        public IndexModel(ILogger<IndexModel> logger, IFoo foo, IOptions<FooOptions> option)
+        public IndexModel(ILogger<IndexModel> logger, IFoo foo, IConfiguration config, IOptions<FooOptions> option)
         {
             _logger = logger;
             logger.LogInformation(foo.DoIt().ToString());
