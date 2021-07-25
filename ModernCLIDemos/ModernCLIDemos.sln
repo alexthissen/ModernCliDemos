@@ -3,7 +3,11 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.0.31423.177
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DemoCLI", "DemoCLI\DemoCLI.csproj", "{B3DD45DD-0595-4CCE-AD77-47C5A4D57698}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DemoCLI", "DemoCLI\DemoCLI.csproj", "{B3DD45DD-0595-4CCE-AD77-47C5A4D57698}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DemoCLIDragonFruit", "DemoCLIDragonFruit\DemoCLIDragonFruit.csproj", "{70CF82C0-331F-4FFF-8A27-88DBC83D9F05}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ASPNETCoreWithCLI", "ASPNETCoreWithCLI\ASPNETCoreWithCLI.csproj", "{782A66D4-4811-4E2C-ACC9-5D1F9658E76D}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,6 +19,14 @@ Global
 		{B3DD45DD-0595-4CCE-AD77-47C5A4D57698}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B3DD45DD-0595-4CCE-AD77-47C5A4D57698}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B3DD45DD-0595-4CCE-AD77-47C5A4D57698}.Release|Any CPU.Build.0 = Release|Any CPU
+		{70CF82C0-331F-4FFF-8A27-88DBC83D9F05}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{70CF82C0-331F-4FFF-8A27-88DBC83D9F05}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{70CF82C0-331F-4FFF-8A27-88DBC83D9F05}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{70CF82C0-331F-4FFF-8A27-88DBC83D9F05}.Release|Any CPU.Build.0 = Release|Any CPU
+		{782A66D4-4811-4E2C-ACC9-5D1F9658E76D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{782A66D4-4811-4E2C-ACC9-5D1F9658E76D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{782A66D4-4811-4E2C-ACC9-5D1F9658E76D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{782A66D4-4811-4E2C-ACC9-5D1F9658E76D}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

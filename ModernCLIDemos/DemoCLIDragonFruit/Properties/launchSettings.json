@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "DemoCLIDragonFruit": {
+      "commandName": "Project",
+      "commandLineArgs": "--count 5 --greeting \"Alex Thissen\" --file test.txt"
+    }
+  }
+}

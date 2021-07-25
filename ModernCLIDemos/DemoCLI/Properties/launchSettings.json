@@ -1,0 +1,11 @@
+{
+  "profiles": {
+    "DemoCLI": {
+      "commandName": "Project",
+      "commandLineArgs": "[debug] [test] a b",
+      "environmentVariables": {
+        "DOTNET_COMMANDLINE_DEBUG_PROCESSES": "DemoCLI"
+      }
+    }
+  }
+}
