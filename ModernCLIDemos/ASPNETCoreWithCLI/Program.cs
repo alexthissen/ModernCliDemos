@@ -13,6 +13,7 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using System.CommandLine.Parsing;
 using System.Xml.Linq;
+using System.CommandLine.Binding;
 
 namespace ASPNETCoreWithCLI
 {
@@ -25,17 +26,20 @@ namespace ASPNETCoreWithCLI
                 .UseMiddleware((context, next) =>
                 {
                     // Execute middleware before running host
+                    // Could decide to not propagate and short circuit calling
                     return next(context);
                 })
                 .UseHost(
                     args => CreateHostBuilder(args),
                     builder =>
                     {
-                        //builder.Properties.TryGetValue(typeof(InvocationContext), out var context);
                         InvocationContext context = builder.GetInvocationContext();
                         var args = context.ParseResult.UnparsedTokens.ToArray();
                         builder.ConfigureHostConfiguration(config =>
                         {
+                            // Leverages "normal" command-line arguments
+                            // from Microsoft.Extensions.Configuration.CommandLine
+                            // for unparsed tokens after --
                             config.AddCommandLine(args);
                         });
 
@@ -43,10 +47,12 @@ namespace ASPNETCoreWithCLI
                         {
                             // Bind to options from command line
                             services.AddOptions<FooOptions>().BindCommandLine();
-
                             // Use invocation context for smart things
                             context = builder.GetInvocationContext();
                         });
+
+                        // Register command handlers to use dependency injection when constructed
+                        builder.UseCommandHandler<SimulationCommand, SimulationCommandHandler>();
                     })
                 .UseMiddleware((context, next) =>
                 {
@@ -75,7 +81,9 @@ namespace ASPNETCoreWithCLI
             level.IsRequired = true;
             simulate.AddOption(level);
             simulate.Handler = CommandHandler.Create<int, ParseResult, IConsole, IHost>(Simulate);
-            root.AddCommand(simulate);
+            //root.AddCommand(simulate);
+
+            root.AddCommand(new SimulationCommand());
 
             return new CommandLineBuilder(root);
         }
@@ -106,6 +114,45 @@ namespace ASPNETCoreWithCLI
                 });
 
     }
+
+    public class SimulationCommand : Command
+    {
+        public SimulationCommand() : base("simulate")
+        {
+            AddOption(new Option<string>("--bar"));
+            AddOption(new Option<string>("--baz"));
+            Option<int> level = new Option<int>(new[] { "--level", "-l" }, "Simulation level");
+            level.IsRequired = true;
+            AddOption(level);
+        }
+    }
+
+    public class SimulationCommandHandler : ICommandHandler
+    {
+        private readonly IFoo foo;
+
+        public SimulationCommandHandler(IFoo foo, ParseResult result, IConsole console, IHost host)
+        {
+            this.foo = foo;
+        }
+
+        // Properties matched from binding context
+        public string Bar { get; set; }
+        public string Baz { get; set; }
+        public int Level { get; set; }
+
+        // Poroperties set from dependency injection
+        public IConsole Console { get; set; }
+        public IHost Host { get; set; }
+        public BindingContext BindingContext { get; set; }
+
+        public Task<int> InvokeAsync(InvocationContext context)
+        {
+            foo.DoIt();
+            return Task.FromResult(1);
+        }
+    }    
+
 
     public class FooOptions
     {
