@@ -23,12 +23,14 @@ namespace ASPNETCoreWithCLI
         {
             Parser parser = BuildCommandLine()
                 .UseDefaults()
-                .UseMiddleware((context, next) =>
+                .UseMiddleware(async (context, next) =>
                 {
                     // Execute middleware before running host
                     // Could decide to not propagate and short circuit calling
-                    return next(context);
-                })
+                    //if (context.ParseResult.FindResultFor(versionOption) is { } result)
+                    //{ }
+                    await next(context);
+                }, MiddlewareOrder.ErrorReporting)
                 .UseHost(
                     args => CreateHostBuilder(args),
                     builder =>
