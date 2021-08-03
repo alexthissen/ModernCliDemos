@@ -15,8 +15,9 @@ namespace DemoCLI
         public void Run()
         {
             Console.WriteLine("Starting emulator...");
-            Console.WriteLine($"\tMagnification {options.Magnification}");
-            Console.WriteLine($"\tFull screen {options.Magnification}");
+            
+            Console.WriteLine($"\tMagnification: {options.Magnification}");
+            Console.WriteLine($"\tFull screen: {options.FullScreen}");
             Console.WriteLine($"\tGame ROM: '{options.GameRom}'");
             Console.WriteLine($"\tBoot ROM: '{options.BootRom}'");
             Console.WriteLine($"\tController type: {options.Controller}");

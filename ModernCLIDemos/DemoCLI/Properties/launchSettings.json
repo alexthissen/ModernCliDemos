@@ -2,7 +2,7 @@
   "profiles": {
     "DemoCLI": {
       "commandName": "Project",
-      "commandLineArgs": "[debug] [test] a b",
+      "commandLineArgs": "APB.lnx -m 7",
       "environmentVariables": {
         "DOTNET_COMMANDLINE_DEBUG_PROCESSES": "DemoCLI"
       }
