@@ -1,4 +1,5 @@
 ﻿using Emulator;
+using Spectre.Console;
 using System;
 using System.Collections.Generic;
 using System.CommandLine;
@@ -41,11 +42,37 @@ namespace AdvancedCLI
         {
             var token = context.GetCancellationToken();
 
-            while (!token.IsCancellationRequested)
-            {
-                context.Console.Out.Write($"Converting from {input.Name} to {output.Name}" + Environment.NewLine);
-                Thread.Sleep(2000);
-            }
+            //while (!token.IsCancellationRequested)
+            //{
+            //    context.Console.Out.Write($"Converting from {input.Name} to {output.Name}" + Environment.NewLine);
+            //    Thread.Sleep(2000);
+            //}
+
+            AnsiConsole.Progress()
+                    .AutoRefresh(true) // Turn off auto refresh
+                    .AutoClear(false)   // Do not remove the task list when done
+                    .HideCompleted(false)   // Hide tasks as they are completed
+                    .Columns(new ProgressColumn[]
+                    {
+                        new TaskDescriptionColumn(),    // Task description
+                        new ProgressBarColumn(),        // Progress bar
+                        new PercentageColumn(),         // Percentage
+                        new RemainingTimeColumn(),      // Remaining time
+                        new SpinnerColumn() { Spinner = Spinner.Known.Default } 
+                    })
+                .Start(context =>
+                {
+                    // Define tasks
+                    var task1 = context.AddTask("[green]Converting[/]");
+                    var task2 = context.AddTask("[green]Writing[/]");
+
+                    while (!context.IsFinished && !token.IsCancellationRequested)
+                    {
+                        task1.Increment(1.5);
+                        task2.Increment(0.5);
+                        Thread.Sleep(100);
+                    }
+                });
         }
     }
 }
