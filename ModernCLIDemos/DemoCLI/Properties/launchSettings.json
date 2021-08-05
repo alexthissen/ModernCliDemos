@@ -2,7 +2,7 @@
   "profiles": {
     "DemoCLI": {
       "commandName": "Project",
-      "commandLineArgs": "APB.lnx -m 7",
+      "commandLineArgs": "Zarlor.lnx -m 7 --fullscreen",
       "environmentVariables": {
         "DOTNET_COMMANDLINE_DEBUG_PROCESSES": "DemoCLI"
       }

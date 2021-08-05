@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Emulator;
+using System;
 using System.CommandLine;
 using System.CommandLine.Builder;
 using System.CommandLine.Help;
@@ -10,7 +11,7 @@ using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
 
-namespace DemoCLI
+namespace StandardCLI
 {
     class Program
     {
@@ -21,36 +22,18 @@ namespace DemoCLI
 
         public static int Main(string[] args)
         {
-            RootCommand rootCommand = new RootCommand("Atari Lynx Emulator");
+            RootCommand rootCommand = new RootCommand("Atari Lynx Emulator Simulator");
             rootCommand.TreatUnmatchedTokensAsErrors = true;
 
-            rootCommand.Handler = CommandHandler.Create<int, bool, ControllerType, FileInfo, FileInfo>(
-                (magnification, fullScreen, controller, bootRom, gameRom) =>
-                {
-                    EmulatorClientOptions options = new EmulatorClientOptions(gameRom)
-                    {
-                        FullScreen = fullScreen,
-                        Magnification = magnification,
-                        BootRom = bootRom,
-                        Controller = controller
-                    };
-                    StartEmulator(options);
-                });
-            //rootCommand.Handler = CommandHandler.Create<int, bool, ControllerType, FileInfo, FileInfo>(StartEmulator);
-            //rootCommand.Handler = CommandHandler.Create<EmulatorClientOptions>(StartEmulator);
-
             // Arguments
-            rootCommand.AddArgument(
-                new Argument<FileInfo>("gamerom", "Game ROM file"));
+            rootCommand.AddArgument(new Argument<FileInfo>("gamerom", "Game ROM file"));
 
             // Options
             rootCommand.AddOption(new Option<bool>(new[] { "--fullscreen", "-f" }, () => false, "Run full screen"));
-            rootCommand.AddOption(
-                new Option<ControllerType>(
-                    new string[] { "--controller", "-c" },
-                    () => ControllerType.Keyboard,
-                    "Type of controller to use"
-                )
+            rootCommand.AddOption(new Option<ControllerType>(
+                new string[] { "--controller", "-c" },
+                () => ControllerType.Keyboard,
+                "Type of controller to use")
             );
 
             Option<int> magnificationOption = new Option<int>("--magnification", "Magnification of screen");
@@ -69,12 +52,28 @@ namespace DemoCLI
             });
             rootCommand.AddOption(magnificationOption);
 
+            rootCommand.Handler = CommandHandler.Create<int, bool, ControllerType, FileInfo, FileInfo>(
+                (magnification, fullScreen, controller, bootRom, gameRom) =>
+                {
+                    EmulatorClientOptions options = new EmulatorClientOptions(gameRom)
+                    {
+                        FullScreen = fullScreen,
+                        Magnification = magnification,
+                        BootRom = bootRom,
+                        Controller = controller
+                    };
+                    Emulate(options);
+                });
+
+            // Alternatively, provide separate function instead of lambda
+            //rootCommand.Handler = CommandHandler.Create<int, bool, ControllerType, FileInfo, FileInfo>(Emulate);
+
             // Parse command-line
             Parser parser = new CommandLineBuilder(rootCommand).UseDefaults().Build();
             return parser.Invoke(args);
         }
 
-        private static void StartEmulator(int magnification, bool fullScreen, ControllerType controller, FileInfo bootRom, FileInfo gameRom)
+        private static void Emulate(int magnification, bool fullScreen, ControllerType controller, FileInfo bootRom, FileInfo gameRom)
         {
             EmulatorClientOptions options = new EmulatorClientOptions(gameRom)
             {
@@ -83,60 +82,12 @@ namespace DemoCLI
                 BootRom = bootRom,
                 Controller = controller
             };
-            StartEmulator(options);
-        }
-
-        private static void StartEmulator(EmulatorClientOptions options)
-        {
             new EmulatorClient(options).Run();
         }
 
-        /// <summary>
-        /// Atari Lynx Emulator from DragonFruit
-        /// </summary>
-        /// <param name="gameRom">Game ROM filename</param>
-        /// <param name="fullScreen">Run emulator fullscreen</param>
-        /// <param name="magnification">Magnification of screen</param>
-        /// <param name="controller">Controller type</param>
-        /// <param name="bootRom">Optional replacement boot ROM</param>
-        /// <returns>Always zero</returns>
-        static int Main(FileInfo gameRom, bool fullScreen = false, 
-            int magnification = 4, ControllerType controller = ControllerType.Keyboard, 
-            FileInfo bootRom = null)
+        private static void Emulate(EmulatorClientOptions options)
         {
-            StartEmulator(magnification, fullScreen, controller, bootRom, gameRom);
-            return 0;
+            new EmulatorClient(options).Run();
         }
-
-        //private static void HandleException(Exception exception, InvocationContext context)
-        //{
-        //    context.Console.ResetTerminalForegroundColor();
-        //    context.Console.SetTerminalForegroundColor(ConsoleColor.Red);
-
-        //    if (exception is TargetInvocationException tie && tie.InnerException is object)
-        //    {
-        //        exception = tie.InnerException;
-        //    }
-
-        //    if (exception is OperationCanceledException)
-        //    {
-        //        context.Console.Error.WriteLine("Operation has been canceled.");
-        //    }
-        //    else if (exception is CommandException command)
-        //    {
-        //        context.Console.Error.WriteLine($"Command '{context.ParseResult.CommandResult.Command.Name}' failed:");
-        //        context.Console.Error.WriteLine($"\t{command.Message}");
-
-        //        if (command.InnerException != null)
-        //        {
-        //            context.Console.Error.WriteLine();
-        //            context.Console.Error.WriteLine(command.InnerException.ToString());
-        //        }
-        //    }
-
-        //    context.Console.ResetTerminalForegroundColor();
-        //    context.ExitCode = 1;
-        //}
-
     }
 }

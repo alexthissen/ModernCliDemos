@@ -1,8 +1,8 @@
 {
   "profiles": {
-    "DemoCLIDragonFruit": {
+    "DragonFruit": {
       "commandName": "Project",
-      "commandLineArgs": "--version"
+      "commandLineArgs": "--game-rom Zarlor.lnx --magnification 12 --full-screen"
     }
   }
 }

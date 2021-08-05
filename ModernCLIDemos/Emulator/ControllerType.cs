@@ -1,4 +1,4 @@
-﻿namespace DemoCLI
+﻿namespace Emulator
 {
     public enum ControllerType
     {

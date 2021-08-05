@@ -1,0 +1,11 @@
+{
+  "profiles": {
+    "AdvancedCLI": {
+      "commandName": "Project",
+      "commandLineArgs": "help",
+      "environmentVariables": {
+        "DOTNET_COMMANDLINE_DEBUG_PROCESSES": "al"
+      }
+    }
+  }
+}
