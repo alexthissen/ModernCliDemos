@@ -42,24 +42,18 @@ namespace AdvancedCLI
         {
             var token = context.GetCancellationToken();
 
-            //while (!token.IsCancellationRequested)
-            //{
-            //    context.Console.Out.Write($"Converting from {input.Name} to {output.Name}" + Environment.NewLine);
-            //    Thread.Sleep(2000);
-            //}
-
             AnsiConsole.Progress()
-                    .AutoRefresh(true) // Turn off auto refresh
-                    .AutoClear(false)   // Do not remove the task list when done
-                    .HideCompleted(false)   // Hide tasks as they are completed
-                    .Columns(new ProgressColumn[]
-                    {
-                        new TaskDescriptionColumn(),    // Task description
-                        new ProgressBarColumn(),        // Progress bar
-                        new PercentageColumn(),         // Percentage
-                        new RemainingTimeColumn(),      // Remaining time
-                        new SpinnerColumn() { Spinner = Spinner.Known.Default } 
-                    })
+                .AutoRefresh(true)
+                .AutoClear(false)
+                .HideCompleted(false)
+                .Columns(new ProgressColumn[]
+                {
+                    new TaskDescriptionColumn(),    // Task description
+                    new ProgressBarColumn(),        // Progress bar
+                    new PercentageColumn(),         // Percentage
+                    new RemainingTimeColumn(),      // Remaining time
+                    new SpinnerColumn() { Spinner = Spinner.Known.Default } 
+                })
                 .Start(context =>
                 {
                     // Define tasks
