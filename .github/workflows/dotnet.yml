@@ -23,7 +23,9 @@ jobs:
       run: dotnet restore
     - name: Build
       run: dotnet build --no-restore
-    - name: Publish
+    - name: Pack NuGet package for .NET tool
       run: dotnet pack
-    - name: Tool
+    - name: Install our .NET local tool
       run: dotnet tool install --add-source ./nuget atarilynxcli --version 0.1.0
+    - name: Run local tool
+      run: dotnet al convert ./Zarlor.bin -o Zarlor.lnx
