@@ -10,7 +10,9 @@ jobs:
   build:
 
     runs-on: ubuntu-latest
-
+    defaults:
+      run:
+        working-directory: ModernCLIDemos/DemoCLIAdvanced
     steps:
     - uses: actions/checkout@v2
     - name: Setup .NET
@@ -19,7 +21,6 @@ jobs:
         dotnet-version: 6.0.x
     - name: Restore dependencies
       run: dotnet restore
-      working-directory: ModernCLIDemos/DemoCLIAdvanced
     - name: Build
       run: dotnet build --no-restore
     - name: Publish
