@@ -72,8 +72,8 @@ namespace AdvancedCLI
                     }
                 });
 
-            // Non-zero exit code indicates failure
-            context.ExitCode = 0;
+            context.Console.Out.Write("Finished converting");
+            context.ExitCode = 0; // Non-zero exit code indicates failure
         }
     }
 }
