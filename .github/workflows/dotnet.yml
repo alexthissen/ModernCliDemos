@@ -1,0 +1,31 @@
+name: .NET
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ModernCLIDemos/DemoCLIAdvanced
+    steps:
+    - uses: actions/checkout@v2
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v1
+      with:
+        dotnet-version: 6.0.x
+    - name: Restore dependencies
+      run: dotnet restore
+    - name: Build
+      run: dotnet build --no-restore
+    - name: Pack NuGet package for .NET tool
+      run: dotnet pack
+    - name: Install our .NET local tool
+      run: dotnet tool install --add-source ./nuget atarilynxcli --version 0.1.0
+    - name: Run local tool
+      run: dotnet al convert ./Zarlor.bin -o Zarlor.lnx
