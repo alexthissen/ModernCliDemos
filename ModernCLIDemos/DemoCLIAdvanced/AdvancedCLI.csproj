@@ -4,7 +4,6 @@
     <OutputType>Exe</OutputType>
     <TargetFramework>net6.0</TargetFramework>
     <GenerateDocumentationFile>false</GenerateDocumentationFile>
-    <AssemblyName>al</AssemblyName>
 
     <ToolCommandName>al</ToolCommandName>
     <PackAsTool>true</PackAsTool>
@@ -17,7 +16,7 @@
     <SelfContained>false</SelfContained>
     <RuntimeIdentifier>win-x64</RuntimeIdentifier>
 
-    <AssemblyName>atarilynx</AssemblyName>
+    <AssemblyName>atarilynxcli</AssemblyName>
     <Version>0.1.0</Version>
     <AutoGenerateBindingRedirects>false</AutoGenerateBindingRedirects>
     <Description>Atari Lynx Command-Line Interface.</Description>
@@ -28,7 +27,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Spectre.Console" Version="0.41.0" />
+    <PackageReference Include="Spectre.Console" Version="0.43.1-preview.0.2" />
     <PackageReference Include="System.CommandLine" Version="2.0.0-beta1.21308.1" />
   </ItemGroup>
 
@@ -40,6 +39,10 @@
     <None Update="Zarlor.bin">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="nuget\" />
   </ItemGroup>
 
 </Project>

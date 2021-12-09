@@ -43,7 +43,7 @@ namespace AdvancedCLI
             var token = context.GetCancellationToken();
 
             AnsiConsole.Progress()
-                .AutoRefresh(true)
+                .AutoRefresh(false)
                 .AutoClear(false)
                 .HideCompleted(false)
                 .Columns(new ProgressColumn[]
@@ -54,19 +54,21 @@ namespace AdvancedCLI
                     new RemainingTimeColumn(),      // Remaining time
                     new SpinnerColumn() { Spinner = Spinner.Known.Default } 
                 })
-                .Start(context =>
+                .Start(progress =>
                 {
                     // Define tasks
-                    var task1 = context.AddTask("[green]Converting[/]");
-                    var task2 = context.AddTask("[green]Writing[/]");
+                    var task1 = progress.AddTask("[green]Converting[/]");
+                    var task2 = progress.AddTask("[green]Writing[/]");
 
-                    while (!context.IsFinished && !token.IsCancellationRequested)
+                    while (!progress.IsFinished && !token.IsCancellationRequested)
                     {
                         task1.Increment(1.5);
                         task2.Increment(0.5);
-                        Thread.Sleep(100);
+                        Thread.Sleep(20);
+                        if (!context.Console.IsOutputRedirected) progress.Refresh();
                     }
                 });
+            context.ExitCode = 10;
         }
     }
 }
