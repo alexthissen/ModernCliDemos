@@ -65,10 +65,15 @@ namespace AdvancedCLI
                         task1.Increment(1.5);
                         task2.Increment(0.5);
                         Thread.Sleep(20);
-                        if (!context.Console.IsOutputRedirected) progress.Refresh();
+
+                        // Check whether output is piped 
+                        if (!context.Console.IsOutputRedirected) 
+                            progress.Refresh();
                     }
                 });
-            context.ExitCode = 10;
+
+            // Non-zero exit code indicates failure
+            context.ExitCode = 0;
         }
     }
 }
