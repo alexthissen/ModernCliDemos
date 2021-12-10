@@ -19,7 +19,9 @@ namespace AdvancedCLI
         public ConvertCommand() : base("convert", "Converts binary ROM to Handy ROM file")
         {
             // Arguments
-            Argument inputArgument = new Argument<FileInfo>("input", "Binary ROM file (*.bin)").ExistingOnly();
+            Argument inputArgument = 
+                new Argument<FileInfo>("input", "Binary ROM file (*.bin)")
+                .ExistingOnly();
             this.AddArgument(inputArgument);
 
             // Options

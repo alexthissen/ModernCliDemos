@@ -52,14 +52,13 @@ namespace StandardCLI
             });
             rootCommand.AddOption(magnificationOption);
 
-            rootCommand.Handler = CommandHandler.Create<int, bool, ControllerType, FileInfo, FileInfo>(
-                (magnification, fullScreen, controller, bootRom, gameRom) =>
+            rootCommand.Handler = CommandHandler.Create<int, bool, ControllerType, FileInfo>(
+                (magnification, fullScreen, controller, gameRom) =>
                 {
                     EmulatorClientOptions options = new EmulatorClientOptions(gameRom)
                     {
                         FullScreen = fullScreen,
                         Magnification = magnification,
-                        BootRom = bootRom,
                         Controller = controller
                     };
                     Emulate(options);
@@ -73,13 +72,12 @@ namespace StandardCLI
             return parser.Invoke(args);
         }
 
-        private static void Emulate(int magnification, bool fullScreen, ControllerType controller, FileInfo bootRom, FileInfo gameRom)
+        private static void Emulate(int magnification, bool fullScreen, ControllerType controller, FileInfo gameRom)
         {
             EmulatorClientOptions options = new EmulatorClientOptions(gameRom)
             {
                 FullScreen = fullScreen,
                 Magnification = magnification,
-                BootRom = bootRom,
                 Controller = controller
             };
             new EmulatorClient(options).Run();

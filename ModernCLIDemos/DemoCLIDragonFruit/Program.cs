@@ -16,20 +16,18 @@ namespace DragonFruitCLI
         /// <param name="bootRom">Optional replacement boot ROM</param>
         /// <returns>Always zero</returns>
         static int Main(FileInfo gameRom, bool fullScreen = false,
-            int magnification = 4, ControllerType controller = ControllerType.Keyboard,
-            FileInfo bootRom = null)
+            int magnification = 4, ControllerType controller = ControllerType.Keyboard)
         {
-            StartEmulator(magnification, fullScreen, controller, bootRom, gameRom);
+            StartEmulator(magnification, fullScreen, controller, gameRom);
             return 0;
         }
 
-        private static void StartEmulator(int magnification, bool fullScreen, ControllerType controller, FileInfo bootRom, FileInfo gameRom)
+        private static void StartEmulator(int magnification, bool fullScreen, ControllerType controller, FileInfo gameRom)
         {
             EmulatorClientOptions options = new EmulatorClientOptions(gameRom)
             {
                 FullScreen = fullScreen,
                 Magnification = magnification,
-                BootRom = bootRom,
                 Controller = controller
             };
             new EmulatorClient(options).Run();
