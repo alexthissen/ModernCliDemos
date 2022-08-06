@@ -1,16 +1,11 @@
 ﻿using Emulator;
 using Spectre.Console;
-using System;
-using System.Collections.Generic;
 using System.CommandLine;
-using System.CommandLine.Binding;
 using System.CommandLine.Invocation;
-using System.CommandLine.Parsing;
+using System.CommandLine.NamingConventionBinder;
 using System.IO;
 using System.Linq;
-using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
 
 namespace AdvancedCLI
 {
@@ -37,6 +32,7 @@ namespace AdvancedCLI
                 description: "Output Handy ROM file")
                 .LegalFileNamesOnly()); 
 
+            // Naming convention binding
             this.Handler = CommandHandler.Create<FileInfo, FileInfo, InvocationContext>(Convert);
         }
 

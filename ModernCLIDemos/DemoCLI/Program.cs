@@ -2,13 +2,8 @@
 using System;
 using System.CommandLine;
 using System.CommandLine.Builder;
-using System.CommandLine.Help;
-using System.CommandLine.Invocation;
-using System.CommandLine.IO;
 using System.CommandLine.Parsing;
 using System.IO;
-using System.Linq;
-using System.Reflection;
 using System.Threading.Tasks;
 
 namespace StandardCLI
@@ -26,15 +21,17 @@ namespace StandardCLI
             rootCommand.TreatUnmatchedTokensAsErrors = true;
 
             // Arguments
-            rootCommand.AddArgument(new Argument<FileInfo>("gamerom", "Game ROM file"));
+            var gameRomArgument = new Argument<FileInfo>("gamerom", "Game ROM file");
+            rootCommand.AddArgument(gameRomArgument);
 
             // Options
-            rootCommand.AddOption(new Option<bool>(new[] { "--fullscreen", "-f" }, () => false, "Run full screen"));
-            rootCommand.AddOption(new Option<ControllerType>(
+            var fullScreenOption = new Option<bool>(new[] { "--fullscreen", "-f" }, () => false, "Run full screen");
+            var controllerTypeOption = new Option<ControllerType>(
                 new string[] { "--controller", "-c" },
                 () => ControllerType.Keyboard,
-                "Type of controller to use")
-            );
+                "Type of controller to use");
+            rootCommand.AddOption(fullScreenOption);
+            rootCommand.AddOption(controllerTypeOption);
 
             Option<int> magnificationOption = new Option<int>("--magnification", "Magnification of screen");
             magnificationOption.AddAlias("-m");
@@ -45,15 +42,15 @@ namespace StandardCLI
                 // Dangerous to read value here, as it might not be a parseable value
                 //int value = option.GetValueOrDefault<int>();
 
-                if (option.Token == null) return null;
+                if (option.Token == null) return;
                 if (!Int32.TryParse(option.Tokens[0].Value, out int value) || value <= 0 || value > 20)
-                    return "Magnification must be an integer value between 1 and 20";
-                return null;
+                    option.ErrorMessage = "Magnification must be an integer value between 1 and 20";
             });
             rootCommand.AddOption(magnificationOption);
 
-            rootCommand.Handler = CommandHandler.Create<int, bool, ControllerType, FileInfo>(
-                (magnification, fullScreen, controller, gameRom) =>
+            // Order of arguments and options must match method signature
+            rootCommand.SetHandler(
+                (FileInfo gameRom, bool fullScreen, ControllerType controller, int magnification) =>
                 {
                     EmulatorClientOptions options = new EmulatorClientOptions(gameRom)
                     {
@@ -62,10 +59,12 @@ namespace StandardCLI
                         Controller = controller
                     };
                     Emulate(options);
-                });
+                    return Task.FromResult(0);
+                }, 
+                gameRomArgument, fullScreenOption, controllerTypeOption, magnificationOption);
 
             // Alternatively, provide separate function instead of lambda
-            //rootCommand.Handler = CommandHandler.Create<int, bool, ControllerType, FileInfo, FileInfo>(Emulate);
+            //rootCommand.SetHandler(Emulate, magnificationOption, fullScreenOption, controllerTypeOption, gameRomArgument);
 
             // Parse command-line
             Parser parser = new CommandLineBuilder(rootCommand).UseDefaults().Build();

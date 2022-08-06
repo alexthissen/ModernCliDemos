@@ -13,7 +13,6 @@ namespace DragonFruitCLI
         /// <param name="fullScreen">Run emulator fullscreen</param>
         /// <param name="magnification">Magnification of screen</param>
         /// <param name="controller">Controller type</param>
-        /// <param name="bootRom">Optional replacement boot ROM</param>
         /// <returns>Always zero</returns>
         static int Main(FileInfo gameRom, bool fullScreen = false,
             int magnification = 4, ControllerType controller = ControllerType.Keyboard)

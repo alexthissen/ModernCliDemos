@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.CommandLine;
 using System.CommandLine.Invocation;
+using System.CommandLine.NamingConventionBinder;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -37,10 +38,9 @@ namespace AdvancedCLI
                 // Dangerous to read value here, as it might not be a parseable value
                 //int value = option.GetValueOrDefault<int>();
 
-                if (option.Token == null) return null;
+                if (option.Token == null) return;
                 if (!Int32.TryParse(option.Tokens[0].Value, out int value) || value <= 0 || value > 20)
-                    return "Magnification must be an integer value between 1 and 20";
-                return null;
+                    option.ErrorMessage = "Magnification must be an integer value between 1 and 20";
             });
             this.AddOption(magnificationOption);
 

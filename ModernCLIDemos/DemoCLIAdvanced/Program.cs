@@ -5,6 +5,7 @@ using System.CommandLine.Builder;
 using System.CommandLine.Help;
 using System.CommandLine.Invocation;
 using System.CommandLine.IO;
+using System.CommandLine.NamingConventionBinder;
 using System.CommandLine.Parsing;
 using System.IO;
 using System.Linq;
@@ -23,11 +24,7 @@ namespace AdvancedCLI
             rootCommand.AddCommand(new ConvertCommand());
 
             // Show command-line help unless a subcommand was used.
-            rootCommand.Handler = CommandHandler.Create<IHelpBuilder>(help =>
-            {
-                help.Write(rootCommand);
-                return 1;
-            });
+            rootCommand.Handler = CommandHandler.Create(() => rootCommand.Invoke("-h"));
 
             rootCommand.AddGlobalOption(new Option<bool>(new[] { "--verbose", "-v" }, "Show verbose output"));
 
