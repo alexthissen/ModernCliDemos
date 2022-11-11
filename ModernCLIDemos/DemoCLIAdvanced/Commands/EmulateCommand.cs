@@ -49,6 +49,9 @@ namespace AdvancedCLI
 
         private void Emulate(EmulatorClientOptions options, bool verbose)
         {
+            // To demonstrate exception handling
+            if (options.Magnification == 3) throw new CommandException("Intentional expection");
+
             new EmulatorClient(options).Run();
         }
     }
