@@ -1,19 +1,16 @@
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using System;
-using System.Collections.Generic;
+using System.CommandLine;
+using System.CommandLine.Binding;
 using System.CommandLine.Builder;
 using System.CommandLine.Hosting;
 using System.CommandLine.Invocation;
-using System.CommandLine;
+using System.CommandLine.Parsing;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.Extensions.DependencyInjection;
-using System.CommandLine.Parsing;
-using System.Xml.Linq;
-using System.CommandLine.Binding;
 
 namespace ASPNETCoreWithCLI
 {
@@ -49,6 +46,7 @@ namespace ASPNETCoreWithCLI
                         {
                             // Bind to options from command line
                             services.AddOptions<FooOptions>().BindCommandLine();
+
                             // Use invocation context for smart things
                             context = builder.GetInvocationContext();
                         });
@@ -58,8 +56,10 @@ namespace ASPNETCoreWithCLI
                     })
                 .UseMiddleware((context, next) =>
                 {
-                    // Host is available in middleware now
+                    // Host is available in middleware after UseHost call
                     IHost host = context.GetHost();
+
+                    // Use host.Services.GetService and other methods on IServiceProvider
                     return next(context);
                 })
                 .Build();
@@ -73,7 +73,7 @@ namespace ASPNETCoreWithCLI
             root.Handler = CommandHandler.Create<IHost>(async (host) => await host.WaitForShutdownAsync());
             //root.TreatUnmatchedTokensAsErrors = false;
 
-            Command simulate = new Command("simulate")
+            Command simulate = new Command("host")
             {
                 new Option<string>("--bar"),
                 new Option<string>("--baz")
@@ -83,9 +83,8 @@ namespace ASPNETCoreWithCLI
             level.IsRequired = true;
             simulate.AddOption(level);
             simulate.Handler = CommandHandler.Create<int, ParseResult, IConsole, IHost>(Simulate);
-            //root.AddCommand(simulate);
-
-            root.AddCommand(new SimulationCommand());
+//            simulate.AddCommand(new SimulationCommand());
+            root.AddCommand(simulate);
 
             return new CommandLineBuilder(root);
         }
@@ -114,7 +113,6 @@ namespace ASPNETCoreWithCLI
                 {
                     webBuilder.UseStartup<Startup>();
                 });
-
     }
 
     public class SimulationCommand : Command
@@ -140,10 +138,10 @@ namespace ASPNETCoreWithCLI
 
         // Properties matched from binding context
         public string Bar { get; set; }
-        public string Baz { get; set; }
+        public int Baz { get; set; }
         public int Level { get; set; }
 
-        // Poroperties set from dependency injection
+        // Properties set from dependency injection
         public IConsole Console { get; set; }
         public IHost Host { get; set; }
         public BindingContext BindingContext { get; set; }
@@ -153,8 +151,7 @@ namespace ASPNETCoreWithCLI
             foo.DoIt();
             return Task.FromResult(1);
         }
-    }    
-
+    }
 
     public class FooOptions
     {

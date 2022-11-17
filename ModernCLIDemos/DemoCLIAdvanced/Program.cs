@@ -1,5 +1,6 @@
 ﻿using Emulator;
 using System;
+using System.Collections.Generic;
 using System.CommandLine;
 using System.CommandLine.Builder;
 using System.CommandLine.Help;
@@ -27,13 +28,42 @@ namespace AdvancedCLI
             rootCommand.Handler = CommandHandler.Create(() => rootCommand.Invoke("-h"));
 
             rootCommand.AddGlobalOption(new Option<bool>(new[] { "--verbose", "-v" }, "Show verbose output"));
-
+            
             // Parse command-line
             Parser parser = new CommandLineBuilder(rootCommand)
                 .UseDefaults()
+                .UseHelp(context =>
+                {
+                    context.HelpBuilder.CustomizeLayout(_ =>
+                        HelpBuilder.Default.GetLayout()
+                            .Skip(1)
+                            .Prepend(_ => _.Output.Write("Advanced Atari Lynx Emulator CLI"))
+                            .Append(ExamplesSection()));
+                })
                 .UseExceptionHandler(HandleException)
                 .Build();
+            
             return await parser.InvokeAsync(args);
+        }
+
+        private static HelpSectionDelegate ExamplesSection()
+        {
+            return (context) =>
+            {
+                var command = context.Command;
+                if (command == null) return;
+
+                var examples = command.GetType().GetCustomAttributes<ExampleUsageAttribute>();
+                if (examples != null) 
+                {
+                    context.Output.WriteLine("Examples:");
+                    foreach (var example in examples)
+                    {
+                        context.Output.WriteLine($"  # {example.Explanation}");
+                        context.Output.WriteLine("  " + example.Example);
+                    }
+                }
+            };
         }
 
         private static void HandleException(Exception exception, InvocationContext context)
@@ -64,6 +94,18 @@ namespace AdvancedCLI
 
             context.Console.ResetTerminalForegroundColor();
             context.ExitCode = 1;
+        }
+    }
+
+    public class ExampleHelpBuilder : HelpBuilder
+    {
+        public ExampleHelpBuilder(LocalizationResources localizationResources, int maxWidth = int.MaxValue) : base(localizationResources, maxWidth)
+        {
+        }
+
+        public override void Write(HelpContext context)
+        {
+            base.Write(context);
         }
     }
 }

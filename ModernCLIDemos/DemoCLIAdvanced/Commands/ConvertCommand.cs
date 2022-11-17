@@ -9,6 +9,8 @@ using System.Threading;
 
 namespace AdvancedCLI
 {
+    [ExampleUsage("convert zarlor.bin", "Convert 'zarlor.bin' image file to 'zarlor.lnx' ROM")]
+    [ExampleUsage("convert zarlor.bin --output game.lnx", "Convert 'zarlor.bin' to 'game.lnx'")]
     public class ConvertCommand : Command
     {
         public ConvertCommand() : base("convert", "Converts binary ROM to Handy ROM file")
@@ -30,7 +32,7 @@ namespace AdvancedCLI
                     return new FileInfo(Path.ChangeExtension(input.Name, ".lnx"));
                 },
                 description: "Output Handy ROM file")
-                .LegalFileNamesOnly()); 
+                .LegalFileNamesOnly());
 
             // Naming convention binding
             this.Handler = CommandHandler.Create<FileInfo, FileInfo, InvocationContext>(Convert);
