@@ -1,5 +1,12 @@
 {
   "version": 1,
   "isRoot": true,
-  "tools": {}
+  "tools": {
+    "atarilynxcli": {
+      "version": "0.1.0",
+      "commands": [
+        "al"
+      ]
+    }
+  }
 }

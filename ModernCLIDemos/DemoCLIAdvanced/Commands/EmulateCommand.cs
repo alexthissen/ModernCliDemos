@@ -38,7 +38,7 @@ namespace AdvancedCLI
                 // Dangerous to read value here, as it might not be a parseable value
                 //int value = option.GetValueOrDefault<int>();
 
-                if (option.Token == null) return;
+                if (option.Token is null) return;
                 if (!Int32.TryParse(option.Tokens[0].Value, out int value) || value <= 0 || value > 20)
                     option.ErrorMessage = "Magnification must be an integer value between 1 and 20";
             });

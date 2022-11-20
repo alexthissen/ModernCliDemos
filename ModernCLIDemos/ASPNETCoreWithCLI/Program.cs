@@ -69,27 +69,22 @@ namespace ASPNETCoreWithCLI
 
         private static CommandLineBuilder BuildCommandLine()
         {
-            var root = new RootCommand();
-            root.Handler = CommandHandler.Create<IHost>(async (host) => await host.WaitForShutdownAsync());
-            //root.TreatUnmatchedTokensAsErrors = false;
-
-            Command simulate = new Command("host")
+            var root = new RootCommand()
             {
                 new Option<string>("--bar"),
                 new Option<string>("--baz")
             };
-            
+            root.Handler = CommandHandler.Create<int, ParseResult, IConsole, IHost>(RunHost);
+            root.TreatUnmatchedTokensAsErrors = false;
             Option<int> level = new Option<int>(new[] { "--level", "-l" }, "Simulation level");
             level.IsRequired = true;
-            simulate.AddOption(level);
-            simulate.Handler = CommandHandler.Create<int, ParseResult, IConsole, IHost>(Simulate);
-//            simulate.AddCommand(new SimulationCommand());
-            root.AddCommand(simulate);
+            root.AddOption(level);
+            root.AddCommand(new SimulationCommand());
 
             return new CommandLineBuilder(root);
         }
 
-        private static async Task Simulate(int level, ParseResult result, IConsole console, IHost host)
+        private static async Task RunHost(int level, ParseResult result, IConsole console, IHost host)
         {
             var serviceProvider = host.Services;
             var loggerFactory = serviceProvider.GetRequiredService<ILoggerFactory>();
