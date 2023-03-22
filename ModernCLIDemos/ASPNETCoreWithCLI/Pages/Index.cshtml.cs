@@ -14,11 +14,12 @@ namespace ASPNETCoreWithCLI.Pages
     {
         private readonly ILogger<IndexModel> logger;
 
-        public IndexModel(ILogger<IndexModel> logger, IFoo foo, IConfiguration config, IOptions<FooOptions> option)
+        public IndexModel(ILogger<IndexModel> logger, IMigrator migrator, IConfiguration config, IOptions<MigrationOptions> options)
         {
             this.logger = logger; 
-            logger.LogInformation(foo.DoIt().ToString());
-            logger.LogInformation("Bar {bar} and Baz {baz}", option.Value.Bar, option.Value.Baz);
+            logger.LogInformation(migrator.Migrate(options.Value).ToString());
+            logger.LogInformation("Message {Message} and version {Version}", 
+                options.Value.Message, options.Value.Version);
         }
 
         public void OnGet()

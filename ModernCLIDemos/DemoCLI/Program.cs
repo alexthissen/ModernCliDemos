@@ -67,7 +67,8 @@ namespace StandardCLI
             //rootCommand.SetHandler(Emulate, magnificationOption, fullScreenOption, controllerTypeOption, gameRomArgument);
 
             // Parse command-line
-            Parser parser = new CommandLineBuilder(rootCommand).UseDefaults().Build();
+            Parser parser = new CommandLineBuilder(rootCommand)
+                .UseDefaults().Build();
             return parser.Invoke(args);
         }
 

@@ -45,14 +45,14 @@ namespace ASPNETCoreWithCLI
                         builder.ConfigureServices(services =>
                         {
                             // Bind to options from command line
-                            services.AddOptions<FooOptions>().BindCommandLine();
+                            services.AddOptions<MigrationOptions>().BindCommandLine();
 
                             // Use invocation context for smart things
                             context = builder.GetInvocationContext();
                         });
 
                         // Register command handlers to use dependency injection when constructed
-                        builder.UseCommandHandler<SimulationCommand, SimulationCommandHandler>();
+                        builder.UseCommandHandler<MigrationCommand, MigrationCommandHandler>();
                     })
                 .UseMiddleware((context, next) =>
                 {
@@ -71,15 +71,15 @@ namespace ASPNETCoreWithCLI
         {
             var root = new RootCommand()
             {
-                new Option<string>("--bar"),
-                new Option<string>("--baz")
+                new Option<string>("--message"),
+                new Option<string>("--version")
             };
             root.Handler = CommandHandler.Create<int, ParseResult, IConsole, IHost>(RunHost);
             root.TreatUnmatchedTokensAsErrors = false;
             Option<int> level = new Option<int>(new[] { "--level", "-l" }, "Simulation level");
             level.IsRequired = true;
             root.AddOption(level);
-            root.AddCommand(new SimulationCommand());
+            root.AddCommand(new MigrationCommand());
 
             return new CommandLineBuilder(root);
         }
@@ -110,30 +110,30 @@ namespace ASPNETCoreWithCLI
                 });
     }
 
-    public class SimulationCommand : Command
+    public class MigrationCommand : Command
     {
-        public SimulationCommand() : base("simulate")
+        public MigrationCommand() : base("migrate")
         {
-            AddOption(new Option<string>("--bar"));
-            AddOption(new Option<string>("--baz"));
+            AddOption(new Option<string>("--message"));
+            AddOption(new Option<int>("--version"));
             Option<int> level = new Option<int>(new[] { "--level", "-l" }, "Simulation level");
             level.IsRequired = true;
             AddOption(level);
         }
     }
 
-    public class SimulationCommandHandler : ICommandHandler
+    public class MigrationCommandHandler : ICommandHandler
     {
-        private readonly IFoo foo;
+        private readonly IMigrator migrator;
 
-        public SimulationCommandHandler(IFoo foo, ParseResult result, IConsole console, IHost host)
+        public MigrationCommandHandler(IMigrator migrator, ParseResult result, IConsole console, IHost host)
         {
-            this.foo = foo;
+            this.migrator = migrator;
         }
 
         // Properties matched from binding context
-        public string Bar { get; set; }
-        public int Baz { get; set; }
+        public string Message { get; set; }
+        public int Version { get; set; }
         public int Level { get; set; }
 
         // Properties set from dependency injection
@@ -143,24 +143,27 @@ namespace ASPNETCoreWithCLI
 
         public Task<int> InvokeAsync(InvocationContext context)
         {
-            foo.DoIt();
+            migrator.Migrate(new MigrationOptions () {  
+                Message = this.Message,
+                Version = this.Version
+            });
             return Task.FromResult(1);
         }
     }
 
-    public class FooOptions
+    public class MigrationOptions
     {
-        public string Bar { get; set; }
-        public int Baz { get; set; }
+        public string Message { get; set; }
+        public int Version { get; set; }
     }
 
-    public interface IFoo {
-        int DoIt() => 100;
+    public interface IMigrator {
+        int Migrate(MigrationOptions options) => 100;
     }
 
-    public class RealFoo : IFoo { };
+    public class RealMigrator : IMigrator { };
 
-    public class FooSimulator : IFoo {
-        public int DoIt() { return 1; }
+    public class SimulationMigrator : IMigrator {
+        public int Migrate() { return 1; }
     }
 }
