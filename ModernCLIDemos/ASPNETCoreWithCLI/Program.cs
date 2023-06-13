@@ -10,6 +10,7 @@ using System.CommandLine.Hosting;
 using System.CommandLine.Invocation;
 using System.CommandLine.Parsing;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace ASPNETCoreWithCLI
@@ -24,10 +25,13 @@ namespace ASPNETCoreWithCLI
                 {
                     // Execute middleware before running host
                     // Could decide to not propagate and short circuit calling
-                    //if (context.ParseResult.FindResultFor(versionOption) is { } result)
-                    //{ }
+                    //if (context.ParseResult.CommandResult is { } result)
+                    if (context.ParseResult.CommandResult?.Command is MigrationCommand)
+                    {
+                        return;
+                    }
                     await next(context);
-                }, MiddlewareOrder.ErrorReporting)
+                }, MiddlewareOrder.Default)
                 .UseHost(
                     args => CreateHostBuilder(args),
                     builder =>
@@ -86,11 +90,12 @@ namespace ASPNETCoreWithCLI
 
         private static async Task RunHost(int level, ParseResult result, IConsole console, IHost host)
         {
-            var serviceProvider = host.Services;
-            var loggerFactory = serviceProvider.GetRequiredService<ILoggerFactory>();
+            var provider = host.Services;
+            var loggerFactory = provider.GetRequiredService<ILoggerFactory>();
             var logger = loggerFactory.CreateLogger(typeof(Program));
+            var lifetime = provider.GetRequiredService<IHostApplicationLifetime>();
 
-            logger.LogInformation($"Simulating level {level}");
+            logger.LogInformation($"Normal run");
 
             await host.WaitForShutdownAsync();
 
@@ -140,14 +145,14 @@ namespace ASPNETCoreWithCLI
         public IConsole Console { get; set; }
         public IHost Host { get; set; }
         public BindingContext BindingContext { get; set; }
-
+         
         public Task<int> InvokeAsync(InvocationContext context)
         {
-            migrator.Migrate(new MigrationOptions () {  
+            int result = migrator.Migrate(new MigrationOptions () {  
                 Message = this.Message,
                 Version = this.Version
             });
-            return Task.FromResult(1);
+            return Task.FromResult(result);
         }
     }
 
@@ -158,7 +163,7 @@ namespace ASPNETCoreWithCLI
     }
 
     public interface IMigrator {
-        int Migrate(MigrationOptions options) => 100;
+        int Migrate(MigrationOptions options) => 0;
     }
 
     public class RealMigrator : IMigrator { };
