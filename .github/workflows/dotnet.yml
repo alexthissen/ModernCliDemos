@@ -26,6 +26,6 @@ jobs:
     - name: Pack NuGet package for .NET tool
       run: dotnet pack
     - name: Install our .NET local tool
-      run: dotnet tool install --add-source ./nuget atarilynxcli --version 0.1.0
+      run: dotnet tool install --add-source ./nuget atarilynxclidemo --version 0.1.0
     - name: Run local tool
       run: dotnet al convert ./Zarlor.bin -o Zarlor.lnx
