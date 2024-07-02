@@ -37,7 +37,7 @@ namespace AdvancedCLI
             this.Handler = CommandHandler.Create<EmulatorClientOptions, bool, BindingContext>(Emulate);
         }
 
-        private void Emulate(EmulatorClientOptions options, bool verbose, BindingContext context)
+        internal void Emulate(EmulatorClientOptions options, bool verbose, BindingContext context)
         {
             IAnsiConsole console = (IAnsiConsole)context.GetService(typeof(IAnsiConsole));
             if (!console.Confirm("Ready to start?"))

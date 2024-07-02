@@ -13,7 +13,10 @@ using System.CommandLine.Parsing;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
+
+[assembly: InternalsVisibleTo("DemoCLIAdvanced.Tests")]
 
 namespace AdvancedCLI
 {
