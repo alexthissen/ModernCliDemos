@@ -2,7 +2,7 @@
   "profiles": {
     "AdvancedCLI": {
       "commandName": "Project",
-      "commandLineArgs": "convert zarlor.bin",
+      "commandLineArgs": "emulate zarlor.bin",
       "environmentVariables": {
         "DOTNET_COMMANDLINE_DEBUG_PROCESSES": "al;atarilynxcli"
       }
