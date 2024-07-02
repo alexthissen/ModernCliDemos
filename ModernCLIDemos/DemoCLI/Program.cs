@@ -19,7 +19,7 @@ namespace StandardCLI
         {
             RootCommand rootCommand = new RootCommand("Atari Lynx Emulator Simulator");
             rootCommand.TreatUnmatchedTokensAsErrors = true;
-
+            
             // Arguments
             var gameRomArgument = new Argument<FileInfo>("gamerom", "Game ROM file");
             rootCommand.AddArgument(gameRomArgument);
@@ -66,9 +66,11 @@ namespace StandardCLI
             // Alternatively, provide separate function instead of lambda
             //rootCommand.SetHandler(Emulate, magnificationOption, fullScreenOption, controllerTypeOption, gameRomArgument);
 
-            // Parse command-line
+            // Create command-line parser
             Parser parser = new CommandLineBuilder(rootCommand)
-                .UseDefaults().Build();
+                .UseDefaults()
+                .Build();
+
             return parser.Invoke(args);
         }
 

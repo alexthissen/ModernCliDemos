@@ -2,12 +2,12 @@
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <TargetFramework>net7.0</TargetFramework>
+    <TargetFramework>net8.0</TargetFramework>
     <GenerateDocumentationFile>false</GenerateDocumentationFile>
 
     <ToolCommandName>al</ToolCommandName>
     <PackAsTool>true</PackAsTool>
-    <Id>atarilynxcli</Id>
+    <Id>atarilynxclidemo</Id>
     <PackageOutputPath>./nuget</PackageOutputPath>
     
     <Authors>Alex Thissen</Authors>
@@ -16,7 +16,7 @@
     <SelfContained>false</SelfContained>
     <RuntimeIdentifier>win-x64</RuntimeIdentifier>
 
-    <AssemblyName>atarilynxcli</AssemblyName>
+    <AssemblyName>atarilynxclidemo</AssemblyName>
     <Version>0.1.0</Version>
     <AutoGenerateBindingRedirects>false</AutoGenerateBindingRedirects>
     <Description>Atari Lynx Command-Line Interface.</Description>
@@ -27,7 +27,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Spectre.Console" Version="0.46.0" />
+    <PackageReference Include="Spectre.Console" Version="0.49.1" />
     <PackageReference Include="System.CommandLine" Version="2.0.0-beta4.22272.1" />
     <PackageReference Include="System.CommandLine.NamingConventionBinder" Version="2.0.0-beta4.22272.1" />
   </ItemGroup>

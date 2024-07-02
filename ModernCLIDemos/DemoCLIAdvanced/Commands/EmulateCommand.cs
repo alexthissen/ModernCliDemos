@@ -1,12 +1,15 @@
 ﻿using Emulator;
+using Spectre.Console;
 using System;
 using System.Collections.Generic;
 using System.CommandLine;
+using System.CommandLine.Binding;
 using System.CommandLine.Invocation;
 using System.CommandLine.NamingConventionBinder;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace AdvancedCLI
@@ -29,11 +32,35 @@ namespace AdvancedCLI
                 )
             );
 
-            Option<int> magnificationOption = new Option<int>("--magnification", "Magnification of screen");
-            magnificationOption.AddAlias("-m");
-            magnificationOption.SetDefaultValue(4);
-            magnificationOption.IsRequired = false;
-            magnificationOption.AddValidator(option =>
+            this.AddOption(new MagnificationOption());
+
+            this.Handler = CommandHandler.Create<EmulatorClientOptions, bool, BindingContext>(Emulate);
+        }
+
+        private void Emulate(EmulatorClientOptions options, bool verbose, BindingContext context)
+        {
+            IAnsiConsole console = (IAnsiConsole)context.GetService(typeof(IAnsiConsole));
+            if (!console.Confirm("Ready to start?"))
+            {
+                console.MarkupLine("[yellow]Oops[/] [blue]:([/]");
+                return;
+            }
+
+            // To demonstrate exception handling
+            if (options.Magnification == 3) throw new CommandException("Intentional expection");
+
+            new EmulatorClient(options).Run();
+        }
+    }
+
+    public class MagnificationOption: Option<int>
+    {
+        public MagnificationOption() : base(aliases: ["--magnification", "-m"])
+        {
+            this.Description = "Magnification of screen";
+            this.SetDefaultValue(4);
+            this.IsRequired = false;
+            this.AddValidator(option =>
             {
                 // Dangerous to read value here, as it might not be a parseable value
                 //int value = option.GetValueOrDefault<int>();
@@ -42,17 +69,6 @@ namespace AdvancedCLI
                 if (!Int32.TryParse(option.Tokens[0].Value, out int value) || value <= 0 || value > 20)
                     option.ErrorMessage = "Magnification must be an integer value between 1 and 20";
             });
-            this.AddOption(magnificationOption);
-
-            this.Handler = CommandHandler.Create<EmulatorClientOptions, bool>(Emulate);
-        }
-
-        private void Emulate(EmulatorClientOptions options, bool verbose)
-        {
-            // To demonstrate exception handling
-            if (options.Magnification == 3) throw new CommandException("Intentional expection");
-
-            new EmulatorClient(options).Run();
         }
     }
 }

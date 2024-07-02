@@ -1,7 +1,9 @@
 ﻿using Emulator;
+using Spectre.Console;
 using System;
 using System.Collections.Generic;
 using System.CommandLine;
+using System.CommandLine.Binding;
 using System.CommandLine.Builder;
 using System.CommandLine.Help;
 using System.CommandLine.Invocation;
@@ -19,6 +21,9 @@ namespace AdvancedCLI
     {
         public static async Task<int> Main(string[] args)
         {
+            Console.InputEncoding = System.Text.Encoding.UTF8;
+            Console.OutputEncoding = System.Text.Encoding.UTF8;
+
             RootCommand rootCommand = new RootCommand("Atari Lynx Tool");
             rootCommand.TreatUnmatchedTokensAsErrors = true;
             rootCommand.AddCommand(new EmulateCommand());
@@ -28,10 +33,14 @@ namespace AdvancedCLI
             rootCommand.Handler = CommandHandler.Create(() => rootCommand.Invoke("-h"));
 
             rootCommand.AddGlobalOption(new Option<bool>(new[] { "--verbose", "-v" }, "Show verbose output"));
-            
+
             // Parse command-line
             Parser parser = new CommandLineBuilder(rootCommand)
                 .UseDefaults()
+                .AddMiddleware(async (context, next) => {
+                    context.BindingContext.AddService<IAnsiConsole>(provider => AnsiConsole.Console);
+                    await next(context);
+                })
                 .UseHelp(context =>
                 {
                     context.HelpBuilder.CustomizeLayout(_ =>
@@ -82,6 +91,7 @@ namespace AdvancedCLI
             }
             else if (exception is CommandException command)
             {
+                // Alternative is to use middleware
                 context.Console.Error.WriteLine($"Command '{context.ParseResult.CommandResult.Command.Name}' failed:");
                 context.Console.Error.WriteLine($"\t{command.Message}");
 

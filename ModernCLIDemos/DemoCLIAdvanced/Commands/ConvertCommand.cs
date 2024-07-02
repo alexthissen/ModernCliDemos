@@ -1,28 +1,30 @@
 ﻿using Emulator;
 using Spectre.Console;
+using System;
 using System.CommandLine;
 using System.CommandLine.Invocation;
 using System.CommandLine.NamingConventionBinder;
 using System.IO;
 using System.Linq;
 using System.Threading;
+using System.Threading.Tasks;
 
 namespace AdvancedCLI
 {
-    [ExampleUsage("convert zarlor.bin", "Convert 'zarlor.bin' image file to 'zarlor.lnx' ROM")]
+    [ExampleUsage("convert zarlor.bin", "Convert 'zarlor.bin' image file to 'zarlor.lnx' ROM file")]
     [ExampleUsage("convert zarlor.bin --output game.lnx", "Convert 'zarlor.bin' to 'game.lnx'")]
     public class ConvertCommand : Command
     {
         public ConvertCommand() : base("convert", "Converts binary ROM to Handy ROM file")
         {
             // Arguments
-            Argument inputArgument = 
+            Argument<FileInfo> inputArgument = 
                 new Argument<FileInfo>("input", "Binary ROM file (*.bin)")
                 .ExistingOnly();
             this.AddArgument(inputArgument);
 
             // Options
-            this.AddOption(new Option<FileInfo>(new[] { "--output", "-o" },
+            Option<FileInfo> outputOption = new Option<FileInfo>(new[] { "--output", "-o" },
                 isDefault: true,
                 parseArgument: arg =>
                 {
@@ -32,16 +34,25 @@ namespace AdvancedCLI
                     return new FileInfo(Path.ChangeExtension(input.Name, ".lnx"));
                 },
                 description: "Output Handy ROM file")
-                .LegalFileNamesOnly());
+                .LegalFileNamesOnly();
+            this.AddOption(outputOption);
 
             // Naming convention binding
-            this.Handler = CommandHandler.Create<FileInfo, FileInfo, InvocationContext>(Convert);
+            this.Handler = CommandHandler.Create<FileInfo, FileInfo, IConsole, CancellationToken>(Convert);
+
+            // Alternative with lambda expression
+            //this.SetHandler(async (context) =>
+            //{
+            //    FileInfo input = context.ParseResult.GetValueForArgument(inputArgument);
+            //    FileInfo output = context.ParseResult.GetValueForOption<FileInfo>(outputOption);
+
+            //    int returnCode = await Convert(
+            //        input, output, context.Console, context.GetCancellationToken());
+            //});
         }
 
-        private void Convert(FileInfo input, FileInfo output, InvocationContext context)
+        private Task<int> Convert(FileInfo input, FileInfo output, IConsole console, CancellationToken token)
         {
-            var token = context.GetCancellationToken();
-
             AnsiConsole.Progress()
                 .AutoRefresh(false)
                 .AutoClear(false)
@@ -60,6 +71,7 @@ namespace AdvancedCLI
                     var task1 = progress.AddTask("[green]Converting[/]");
                     var task2 = progress.AddTask("[green]Writing[/]");
 
+                    // Use cancellation token or pass down to async method supporting it
                     while (!progress.IsFinished && !token.IsCancellationRequested)
                     {
                         task1.Increment(1.5);
@@ -67,13 +79,13 @@ namespace AdvancedCLI
                         Thread.Sleep(20);
 
                         // Check whether output is piped 
-                        if (!context.Console.IsOutputRedirected) 
+                        if (!console.IsOutputRedirected) 
                             progress.Refresh();
                     }
                 });
 
-            context.Console.Out.Write("Finished converting");
-            context.ExitCode = 0; // Non-zero exit code indicates failure
+            console.Out.Write("Finished converting");
+            return Task.FromResult(0); // Non-zero exit code indicates failure
         }
     }
 }
