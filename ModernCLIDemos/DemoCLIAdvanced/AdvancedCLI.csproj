@@ -9,7 +9,7 @@
     <PackAsTool>true</PackAsTool>
     <Id>atarilynxclidemo</Id>
     <PackageOutputPath>./nuget</PackageOutputPath>
-    
+
     <Authors>Alex Thissen</Authors>
     <Owners>Alex Thissen</Owners>
 
@@ -17,13 +17,13 @@
     <RuntimeIdentifier>win-x64</RuntimeIdentifier>
 
     <AssemblyName>atarilynxclidemo</AssemblyName>
-    <Version>0.1.0</Version>
+    <Version>0.2.0</Version>
     <AutoGenerateBindingRedirects>false</AutoGenerateBindingRedirects>
     <Description>Atari Lynx Command-Line Interface.</Description>
     <RepositoryUrl>https://github.com/alexthissen/atarilynxsdk</RepositoryUrl>
     <RepositoryType>Git</RepositoryType>
-    <AssemblyVersion>0.1.0.0</AssemblyVersion>
-    <FileVersion>0.1.0.0</FileVersion>
+    <AssemblyVersion>0.2.0.0</AssemblyVersion>
+    <FileVersion>0.2.0.0</FileVersion>
   </PropertyGroup>
 
   <ItemGroup>

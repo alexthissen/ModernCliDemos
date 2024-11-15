@@ -42,7 +42,7 @@ namespace AdvancedCLI
             IAnsiConsole console = (IAnsiConsole)context.GetService(typeof(IAnsiConsole));
             if (!console.Confirm("Ready to start?"))
             {
-                console.MarkupLine("[yellow]Oops[/] [blue]:([/]");
+                console.MarkupLine("[red]Oops[/] [blue]:([/]");
                 return;
             }
 
